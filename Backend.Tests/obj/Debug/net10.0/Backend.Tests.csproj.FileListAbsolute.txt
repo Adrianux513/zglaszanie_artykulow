@@ -1,0 +1,7 @@
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\Backend.Tests\bin\Debug\net10.0\.msCoverageSourceRootsMapping_Backend.Tests
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\Backend.Tests\bin\Debug\net10.0\CoverletSourceRootsMapping_Backend.Tests
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\Backend.Tests\obj\Debug\net10.0\Backend.Tests.csproj.AssemblyReference.cache
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\Backend.Tests\obj\Debug\net10.0\Backend.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\Backend.Tests\obj\Debug\net10.0\Backend.Tests.AssemblyInfoInputs.cache
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\Backend.Tests\obj\Debug\net10.0\Backend.Tests.AssemblyInfo.cs
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\Backend.Tests\obj\Debug\net10.0\Backend.Tests.csproj.CoreCompileInputs.cache
