@@ -91,3 +91,4 @@ C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\backend\bin\De
 C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\backend\bin\Debug\net8.0\Microsoft.DotNet.PlatformAbstractions.dll
 C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\backend\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\backend\bin\Debug\net8.0\BouncyCastle.Crypto.dll
+C:\Users\roksa\Downloads\System zgłaszania artykułów naukowych\backend\obj\Debug\net8.0\ArticlesBackend.sourcelink.json

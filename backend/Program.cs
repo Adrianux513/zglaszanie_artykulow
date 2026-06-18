@@ -10,6 +10,9 @@ using Microsoft.Extensions.Caching.Memory;
 // Build
 var builder = WebApplication.CreateBuilder(args);
 
+// Force backend to bind to port 5000 for local and container execution
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
+
 // Config
 var cfg = builder.Configuration;
 var conn = cfg.GetConnectionString("Default") ?? "Data Source=app.db";
@@ -85,7 +88,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
