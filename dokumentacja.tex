@@ -1,0 +1,559 @@
+\documentclass[times]{san}
+
+\bibliografia{bibliografia.bib}
+
+\uczelnia{Społeczna Akademia Nauk}
+\przedmiot{Bazy danych i aplikacje}
+\autor{Adrian}
+\nralbumu{119205}
+\grupa{4}
+\tytul{System zgłaszania artykułów naukowych}
+\prowadzacy{mgr inż. Krystian Gumiński}
+\miasto{Łódź}
+\rok{2026}
+
+\begin{document}
+
+\maketitlepage
+\spistresci
+
+\section{Wstęp}
+
+Niniejszy dokument zawiera szczegółową dokumentację projektu ``System zgłaszania artykułów naukowych''. Projekt został zrealizowany jako aplikacja webowa działająca w architekturze klient-serwer z wykorzystaniem nowoczesnych technologii webowych. Celem systemu jest umożliwienie autorów naukowych przesyłania artykułów, zaś redaktorom i recenzentom -- przydzielania i publikowania recenzji artykułów. Aplikacja wspiera zarządzanie procesem redakcyjnym wraz z systemem powiadomień.
+
+\section{Cel projektu}
+
+Głównym celem projektu jest stworzenie kompleksowego systemu informatycznego do zarządzania procesem zgłaszania i recenzowania artykułów naukowych. Specyficzne cele obejmują:
+
+\begin{itemize}
+    \item Umożliwienie autorom przesyłania artykułów w formacie cyfrowym
+    \item Automatyczne przydzielanie artykułów recenzentom do oceny
+    \item Wspieranie komunikacji między autorami a recenzentami poprzez system powiadomień
+    \item Automatyzacja procesu redakcyjnego z podziałem ról (autor, recenzent, administrator)
+    \item Zabezpieczenie danych użytkowników i materiałów poprzez systemy autentykacji i autoryzacji
+    \item Skalowalna architektura gotowa do rozwijania w przyszłości
+\end{itemize}
+
+Wymagania funkcjonalne systemu obejmują:
+\begin{itemize}
+    \item Rejestracja i logowanie użytkowników
+    \item Zarządzanie profilami użytkowników
+    \item Przesyłanie artykułów z metadanymi
+    \item Przydzielanie artykułów recenzentom
+    \item Prowadzenie recenzji artykułów
+    \item Podejmowanie decyzji redakcyjnych
+    \item System powiadomień o zdarzeniach
+    \item Panel administracyjny do zarządzania systemem
+\end{itemize}
+
+Wymagania niefunkcjonalne dotyczą wydajności, bezpieczeństwa, niezawodności i łatwości utrzymania kodu.
+
+\section{Przegląd architektury}
+
+\subsection{Ogólny model architektoniczny}
+
+System został zbudowany na architekturze trójwarstwowej:
+
+\begin{table}[h]
+\centering
+\caption{Warstwy architektury systemu}
+\label{tab:architecture}
+\begin{tabular}{|c|l|p{6cm}|}
+\hline
+Lp. & Warstwa & Opis \\
+\hline
+1   & Prezentacji & Frontend React aplikacja działająca w przeglądarce \\ 
+2   & Logiki biznesowej & Backend ASP.NET Core z API REST \\
+3   & Danych & Baza danych SQLite \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Podział komponentów}
+
+System składa się z następujących głównych komponentów:
+
+\subsubsection{Backend (ASP.NET Core)}
+
+Backend stanowi serce aplikacji, odpowiadający za całą logikę biznesową:
+
+\begin{itemize}
+    \item \textbf{Serwer API REST} -- udostępnia endpointy dla frontendu
+    \item \textbf{Autentykacja JWT} -- obsługuje logowanie użytkowników i wydawanie tokenów JWT
+    \item \textbf{Entity Framework Core} -- mapowanie obiektowo-relacyjne dla bazy danych
+    \item \textbf{Autoryzacja} -- system ról i uprawnień
+    \item \textbf{Powiadomienia} -- system powiadomień dla użytkowników
+    \item \textbf{Monitoring} -- monitoring systemu za pomocą Prometheus
+\end{itemize}
+
+\subsubsection{Frontend (React + Vite)}
+
+Frontend zapewnia interaktywny interfejs użytkownika:
+
+\begin{itemize}
+    \item \textbf{Strona logowania} -- logowanie i rejestracja użytkowników
+    \item \textbf{Panel autora} -- możliwość przesyłania nowych artykułów oraz przeglądania историї
+    \item \textbf{Panel recenzenta} -- przeglądanie przydzielonych artykułów i prowadzenie recenzji
+    \item \textbf{Panel administratora} -- zarządzanie systemem, użytkownikami i recenzjami
+    \item \textbf{System powiadomień} -- wyświetlanie powiadomień o zdarzeniach
+\end{itemize}
+
+\subsubsection{Baza danych (SQLite)}
+
+Baza danych przechowuje wszystkie dane systemu:
+
+\begin{itemize}
+    \item \textbf{Użytkownicy} -- dane profili użytkowników i dane logowania
+    \item \textbf{Zgłoszenia} -- artykuły przesłane do systemu
+    \item \textbf{Recenzje} -- oceny artykułów od recenzentów
+    \item \textbf{Przydzielenia recenzji} -- mapowanie artykułów na recenzentów
+    \item \textbf{Powiadomienia} -- historia powiadomień dla użytkowników
+\end{itemize}
+
+\section{Model danych}
+
+\subsection{Diagramy encji}
+
+System operuje na następujących głównych encjach:
+
+\begin{table}[h]
+\centering
+\caption{Główne encje systemu}
+\label{tab:entities}
+\begin{tabular}{|c|l|p{5cm}|}
+\hline
+Lp. & Encja & Opis \\
+\hline
+1   & User & Użytkownik systemu \\
+2   & Submission & Artykuł przesłany do systemu \\
+3   & Review & Recenzja artykułu \\
+4   & ReviewAssignment & Przydzielenie artykułu recenzentowi \\
+5   & Notification & Powiadomienie dla użytkownika \\
+6   & FileRecord & Rekord pliku przesłanego \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{User (Użytkownik)}
+
+Encja reprezentująca użytkownika systemu:
+
+\begin{itemize}
+    \item \textbf{Id} -- unikalny identyfikator (guid)
+    \item \textbf{Email} -- adres email, unikalny
+    \item \textbf{Name} -- imię i nazwisko
+    \item \textbf{Role} -- rola w systemie: admin, author, reviewer
+    \item \textbf{PasswordHash} -- zahashowane hasło (BCrypt)
+\end{itemize}
+
+\subsection{Submission (Zgłoszenie)}
+
+Encja reprezentująca artykuł przesłany do systemu:
+
+\begin{itemize}
+    \item \textbf{Id} -- unikalny identyfikator
+    \item \textbf{AuthorId} -- referencja do autora (User)
+    \item \textbf{Title} -- tytuł artykułu
+    \item \textbf{Abstract} -- streszczenie artykułu
+    \item \textbf{Content} -- zawartość artykułu (tekst)
+    \item \textbf{CreatedAt} -- data utworzenia
+    \item \textbf{UpdatedAt} -- data ostatniej aktualizacji
+    \item \textbf{Status} -- status: submitted, under-review, accepted, rejected
+    \item \textbf{Decision} -- ostateczna decyzja redakcyjna
+\end{itemize}
+
+\subsection{Review (Recenzja)}
+
+Encja reprezentująca recenzję artykułu:
+
+\begin{itemize}
+    \item \textbf{Id} -- unikalny identyfikator
+    \item \textbf{SubmissionId} -- referencja do artykułu (Submission)
+    \item \textbf{ReviewerId} -- referencja do recenzenta (User)
+    \item \textbf{Content} -- treść recenzji
+    \item \textbf{Recommendation} -- rekomendacja: accept, reject, major-revisions, minor-revisions
+    \item \textbf{CreatedAt} -- data utworzenia recenzji
+    \item \textbf{UpdatedAt} -- data ostatniej aktualizacji
+\end{itemize}
+
+\subsection{ReviewAssignment (Przydzielenie recenzji)}
+
+Encja reprezentująca przydzielenie artykułu recenzentowi:
+
+\begin{itemize}
+    \item \textbf{Id} -- unikalny identyfikator
+    \item \textbf{SubmissionId} -- referencja do artykułu (Submission)
+    \item \textbf{ReviewerId} -- referencja do recenzenta (User)
+    \item \textbf{AssignedAt} -- data przydzielenia
+    \item \textbf{Status} -- status: pending, completed
+\end{itemize}
+
+\subsection{Notification (Powiadomienie)}
+
+Encja reprezentująca powiadomienie dla użytkownika:
+
+\begin{itemize}
+    \item \textbf{Id} -- unikalny identyfikator
+    \item \textbf{UserId} -- referencja do odbiorcy (User)
+    \item \textbf{Message} -- treść powiadomienia
+    \item \textbf{Type} -- typ: submission, review, decision
+    \item \textbf{IsRead} -- flaga czy przeczytane
+    \item \textbf{CreatedAt} -- data utworzenia
+\end{itemize}
+
+\subsection{FileRecord (Rekord pliku)}
+
+Encja reprezentująca plik przesłany przez użytkownika:
+
+\begin{itemize}
+    \item \textbf{Id} -- unikalny identyfikator
+    \item \textbf{SubmissionId} -- referencja do artykułu (Submission)
+    \item \textbf{FileName} -- nazwa pliku
+    \item \textbf{FilePath} -- ścieżka do pliku na serwerze
+    \item \textbf{UploadedAt} -- data przesłania
+\end{itemize}
+
+\section{Opis implementacji}
+
+\subsection{Backend}
+
+Backend został zbudowany na platformie ASP.NET Core w wersji 8.0 z wykorzystaniem minimal APIs. Architektura backendu składa się z następujących warstw:
+
+\subsubsection{Program.cs -- Punkt wejścia}
+
+Główny plik konfiguracyjny aplikacji ASP.NET Core odpowiada za:
+
+\begin{itemize}
+    \item Konfigurację połączenia z bazą danych (SQLite)
+    \item Rejestrację usług (DbContext, autentykacja, autoryzacja)
+    \item Ustawienie JWT tokenów dla autentykacji
+    \item Konfigurację CORS dla komunikacji z frontendem
+    \item Inicjalizację bazy danych i dane demo
+\end{itemize}
+
+\subsubsection{AppDbContext -- Kontekst bazy danych}
+
+Plik \texttt{Data/AppDbContext.cs} zawiera konfigurację Entity Framework Core:
+
+\begin{itemize}
+    \item Definicję DbSets dla wszystkich encji
+    \item Konfigurację relacji między encjami
+    \item Ustawienia migrac1 bazy danych
+\end{itemize}
+
+\subsubsection{Modele}
+
+Folder \texttt{Models/} zawiera definicje wszystkich encji systemu w plikach:
+
+\begin{itemize}
+    \item \texttt{User.cs} -- encja użytkownika
+    \item \texttt{Submission.cs} -- encja artykułu
+    \item \texttt{Review.cs} -- encja recenzji
+    \item \texttt{ReviewAssignment.cs} -- encja przydzielenia recenzji
+    \item \texttt{Notification.cs} -- encja powiadomienia
+    \item \texttt{FileRecord.cs} -- encja rekordu pliku
+\end{itemize}
+
+\subsubsection{Endpointy API}
+
+System udostępnia następujące endpointy REST API:
+
+\begin{enumerate}
+    \item \textbf{Autentykacja}
+    \begin{itemize}
+        \item \texttt{POST /api/auth/register} -- rejestracja nowego użytkownika
+        \item \texttt{POST /api/auth/login} -- logowanie użytkownika
+    \end{itemize}
+    
+    \item \textbf{Zgłoszenia/Artykuły}
+    \begin{itemize}
+        \item \texttt{POST /api/submissions} -- przesłanie nowego artykułu
+        \item \texttt{GET /api/submissions} -- pobranie własnych artykułów
+        \item \texttt{PUT /api/submissions/\{id\}} -- aktualizacja artykułu
+        \item \texttt{GET /api/submissions/\{id\}/reviews} -- pobranie recenzji artykułu
+    \end{itemize}
+    
+    \item \textbf{Recenzje}
+    \begin{itemize}
+        \item \texttt{GET /api/reviews/assigned} -- pobranie przydzielonych recenzji
+        \item \texttt{POST /api/submissions/\{id\}/reviews} -- przesłanie recenzji
+        \item \texttt{POST /api/submissions/\{id\}/decision} -- podjęcie decyzji redakcyjnej
+    \end{itemize}
+    
+    \item \textbf{Administracja (admin only)}
+    \begin{itemize}
+        \item \texttt{GET /api/admin/submissions} -- przeglądanie wszystkich artykułów
+        \item \texttt{GET /api/admin/reviewers} -- przeglądanie recenzentów
+        \item \texttt{POST /api/submissions/\{id\}/assign-reviewer} -- przydzielenie recenzenta
+    \end{itemize}
+    
+    \item \textbf{Powiadomienia}
+    \begin{itemize}
+        \item \texttt{GET /api/notifications} -- pobranie powiadomień
+        \item \texttt{PUT /api/notifications/\{id\}} -- oznaczenie powiadomienia jako przeczytane
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Frontend}
+
+Frontend został zbudowany na platformie React z narzędziem Vite. Architektura frontendu obejmuje:
+
+\subsubsection{Struktura projektu}
+
+\begin{itemize}
+    \item \texttt{src/main.jsx} -- punkt wejścia aplikacji
+    \item \texttt{src/App.jsx} -- główny komponent aplikacji
+    \item \texttt{src/styles.css} -- style CSS
+    \item \texttt{index.html} -- plik HTML
+    \item \texttt{vite.config.js} -- konfiguracja Vite
+    \item \texttt{package.json} -- zależności i skrypty
+\end{itemize}
+
+\subsubsection{Główne komponenty}
+
+\begin{itemize}
+    \item \textbf{Login/Register} -- formularz logowania i rejestracji
+    \item \textbf{Submission Form} -- formularz do przesyłania artykułów
+    \item \textbf{My Submissions} -- lista artykułów przesłanych przez użytkownika
+    \item \textbf{Assigned Reviews} -- lista przydzielonych artykułów do recenzowania
+    \item \textbf{Notifications} -- panel powiadomień
+    \item \textbf{Admin Dashboard} -- panel administracyjny (widoczny tylko dla adminów)
+\end{itemize}
+
+\subsubsection{Komunikacja z backendem}
+
+Frontend komunikuje się z backendem za pomocą zapytań HTTP (fetch API):
+
+\begin{itemize}
+    \item Autentykacja przez tokeny JWT przechowywane w localStorage
+    \item Nagłówek Authorization zawierający token w każdym żądaniu
+    \item Obsługa błędów i wyświetlanie komunikatów
+    \item Automatyczne odświeżanie danych po zmianach
+\end{itemize}
+
+\subsection{Baza danych}
+
+Baza danych SQLite przechowuje wszystkie dane systemu. Struktura bazy jest tworzona automatycznie przez Entity Framework Core na podstawie definicji modeli.
+
+\subsubsection{Tabele}
+
+Tabele w bazie odpowiadają encjom zdefiniowanym w modelu:
+
+\begin{itemize}
+    \item \texttt{Users} -- użytkownicy
+    \item \texttt{Submissions} -- artykuły
+    \item \texttt{Reviews} -- recenzje
+    \item \texttt{ReviewAssignments} -- przydzielenia recenzji
+    \item \texttt{Notifications} -- powiadomienia
+    \item \texttt{FileRecords} -- rekordy plików
+\end{itemize}
+
+\subsection{Docker}
+
+Aplikacja jest skonteneryizowana dla łatwego wdrażania. Plik \texttt{docker-compose.yml} definiuje usługi:
+
+\begin{itemize}
+    \item Backend -- serwer ASP.NET Core
+    \item Frontend -- aplikacja React
+    \item SQLite -- baza danych (może być zastąpiona innymi)
+\end{itemize}
+
+\subsubsection{Dockerfiles}
+
+\begin{itemize}
+    \item \texttt{backend/Dockerfile} -- obraz dla backendu ASP.NET Core
+    \item \texttt{frontend/Dockerfile} -- obraz dla frontendu React
+\end{itemize}
+
+Obrazy są budowane z wielostopniową budową (multi-stage build) dla optymalizacji rozmiaru.
+
+\section{Stos technologiczny}
+
+\subsection{Backend}
+
+\begin{table}[h]
+\centering
+\caption{Technologie backendu}
+\label{tab:backend_tech}
+\begin{tabular}{|l|l|p{4cm}|}
+\hline
+Technologia & Wersja & Zastosowanie \\
+\hline
+ASP.NET Core & 8.0 & Framework webowy \\
+Entity Framework Core & 7.0.0 & ORM \\
+SQLite & - & Baza danych \\
+JWT Bearer & 7.0.0 & Autentykacja \\
+BCrypt.Net & 4.0.2 & Haszowanie haseł \\
+Prometheus & 8.2.1 & Monitoring \\
+Swagger & 6.6.1 & Dokumentacja API \\
+iText7 & 7.2.5 & Generowanie PDF \\
+CsvHelper & 33.0.1 & Obsługa CSV \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Frontend}
+
+\begin{table}[h]
+\centering
+\caption{Technologie frontendu}
+\label{tab:frontend_tech}
+\begin{tabular}{|l|l|p{4cm}|}
+\hline
+Technologia & Wersja & Zastosowanie \\
+\hline
+React & najnowsza & Framework UI \\
+Vite & najnowsza & Build tool \\
+JavaScript/JSX & ES2020+ & Język programowania \\
+CSS & 3 & Style \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Konta testowe}
+
+System zawiera predefiniowane konta testowe do celów demonstracyjnych:
+
+\begin{table}[h]
+\centering
+\caption{Konta testowe}
+\label{tab:test_accounts}
+\begin{tabular}{|l|l|l|l|}
+\hline
+Email & Hasło & Rola & Opis \\
+\hline
+admin@example.com & adminpass & admin & Administrator \\
+student@example.com & pass123 & author & Autor artykułów \\
+reviewer1@example.com & reviewerpass1 & reviewer & Recenzent 1 \\
+reviewer2@example.com & reviewerpass2 & reviewer & Recenzent 2 \\
+reviewer3@example.com & reviewerpass3 & reviewer & Recenzent 3 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Instalacja i uruchomienie}
+
+\subsection{Wymagania}
+
+\begin{itemize}
+    \item .NET 8.0 SDK (dla backendu)
+    \item Node.js 18+ (dla frontendu)
+    \item Docker i Docker Compose (opcjonalnie)
+    \item Git (do klonowania repozytorium)
+\end{itemize}
+
+\subsection{Uruchomienie lokalne}
+
+\subsubsection{Backend}
+
+\begin{enumerate}
+    \item Przejść do folderu backendu: \texttt{cd backend}
+    \item Przywrócić zależności: \texttt{dotnet restore}
+    \item Uruchomić aplikację: \texttt{dotnet run}
+    \item Backend będzie dostępny na: \texttt{http://localhost:5000}
+    \item Dokumentacja Swagger: \texttt{http://localhost:5000/swagger}
+\end{enumerate}
+
+\subsubsection{Frontend}
+
+\begin{enumerate}
+    \item Przejść do folderu frontendu: \texttt{cd frontend}
+    \item Zainstalować zależności: \texttt{npm install}
+    \item Uruchomić dev serwer: \texttt{npm run dev}
+    \item Frontend będzie dostępny na: \texttt{http://localhost:3000}
+\end{enumerate}
+
+\subsubsection{Przygotowanie bazy danych}
+
+Jeśli uruchamiasz aplikację po raz pierwszy:
+
+\begin{enumerate}
+    \item Usuń plik \texttt{backend/app.db} (jeśli istnieje)
+    \item Uruchom backend -- baza będzie automatycznie utworzona ze schematem
+\end{enumerate}
+
+\subsection{Uruchomienie z Docker}
+
+Całą aplikację można uruchomić za pomocą Docker Compose:
+
+\begin{verbatim}
+docker compose down
+docker compose up --build
+\end{verbatim}
+
+To uruchomi backend, frontend i wszystkie wymagane usługi.
+
+\section{Bezpieczeństwo}
+
+\subsection{Autentykacja}
+
+\begin{itemize}
+    \item JWT tokeny z sekretem konfigurowalnym przez zmienne środowiskowe
+    \item Hasła zahashowane za pomocą BCrypt z odpowiednim salt
+    \item Tokeny tracą ważność po określonym czasie
+\end{itemize}
+
+\subsection{Autoryzacja}
+
+\begin{itemize}
+    \item System ról (admin, author, reviewer)
+    \item Polityki autoryzacji dla chronionych endpointów
+    \item Kontrola dostępu oparta na rolach (RBAC)
+\end{itemize}
+
+\subsection{CORS}
+
+\begin{itemize}
+    \item CORS skonfigurowany dla określonych źródeł (localhost)
+    \item Możliwość rozszerzenia dla produkcji
+\end{itemize}
+
+\subsection{Rekomendacje dla produkcji}
+
+\begin{itemize}
+    \item Zamienić SQLite na produkcyjną bazę (PostgreSQL, SQL Server)
+    \item Wymusić HTTPS
+    \item Skonfigurować certyfikaty SSL/TLS
+    \item Zarządzać sekretem JWT w zmiennych środowiskowych
+    \item Dodać rate limiting
+    \item Włączyć logging i monitoring
+    \item Przeprowadzić security audit
+\end{itemize}
+
+\section{Przyszłe rozszerzenia}
+
+\subsection{Planowane funkcjonalności}
+
+\begin{itemize}
+    \item Obsługa przesyłania plików PDF i innych formatów
+    \item Zaawansowana wyszukiwarka artykułów
+    \item Komentarze do recenzji
+    \item Historia zmian statusu artykułu
+    \item Eksport raportów w PDF/CSV
+    \item Integracja z email do powiadomień
+    \item Dwustopniowa autentykacja (2FA)
+    \item Rola moderatora
+    \item Automatyczne przypomnienia o terminach
+    \item API dla integracji z innymi systemami
+\end{itemize}
+
+\subsection{Ulepszenia techniczne}
+
+\begin{itemize}
+    \item Migracja na Entity Framework 8+
+    \item Dodanie cachingu (Redis)
+    \item Implementacja CQRS pattern
+    \item Testy jednostkowe i integracyjne
+    \item CI/CD pipeline
+    \item Dokumentacja API OpenAPI/Swagger
+    \item Optymalizacja wydajności bazy danych
+    \item Load testing
+\end{itemize}
+
+\section{Podsumowanie}
+
+System zgłaszania artykułów naukowych stanowi kompleksową platformę do zarządzania procesem recenzowania artykułów. Architektura oparta na nowoczesnych technologiach webowych zapewnia skalowalność i łatwość rozwijania. Aplikacja jest gotowa do wdrożenia zarówno lokalnie jak i w środowisku produkcyjnym z wykorzystaniem Docker.
+
+Dokumentacja kodu, system roli i autoryzacji, oraz rozdzielenie warstwy prezentacji od logiki biznesowej ułatwia utrzymanie i rozwijanie systemu. Projekt stanowi solidną bazę do dalszego rozwoju i dostosowania do konkretnych potrzeb użytkowników.
+
+\end{document}
